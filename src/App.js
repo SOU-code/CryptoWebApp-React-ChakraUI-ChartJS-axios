@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import Coins from "./components/Coins";
 import Exchanges from "./components/Exchanges";
 import CoinDetails from "./components/CoinDetails";
+import "./css/loader.css";
 function App() {
   return (
     <Router>
