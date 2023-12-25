@@ -26,13 +26,12 @@ const Exchanges = () => {
     <Container maxW={"container.xl"}>
       {loader ? (
         <Loader />
-      ) : (
-          // Braket needed
-        urlError ? (
+      ) : // Braket needed
+      urlError ? (
         <ErrorPage />
       ) : (
         <>
-          <HStack wrap={"wrap"} justify={"center"}>
+          <HStack wrap={"wrap"} justify={"space-evenly"}>
             {exchangeData.map((i) => (
               <div>
                 <ExchangeCard
@@ -45,7 +44,7 @@ const Exchanges = () => {
             ))}
           </HStack>
         </>
-      ))}
+      )}
     </Container>
   );
 };

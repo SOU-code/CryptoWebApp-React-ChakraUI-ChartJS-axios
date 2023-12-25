@@ -42,14 +42,14 @@ const Coins = () => {
         <ErrorPage />
       ) : (
         <>
-          <HStack wrap={"wrap"} justify={"center"}>
-            <RadioGroup value={currency} onChange={setCurrency} p={4} w={"full"}>
-              <HStack spacing={4}>
-                <Radio value="inr">INR</Radio>
-                <Radio value="usd">USD</Radio>
-                <Radio value="eur">EUR</Radio>
-              </HStack>
-            </RadioGroup>
+          <RadioGroup value={currency} onChange={setCurrency} p={4}>
+            <HStack spacing={4}>
+              <Radio value="inr">INR</Radio>
+              <Radio value="usd">USD</Radio>
+              <Radio value="eur">EUR</Radio>
+            </HStack>
+          </RadioGroup>
+          <HStack wrap={"wrap"} justifyContent={"space-evenly"}>
             {coins.map((i) => (
               <div>
                 <CoinCard
@@ -66,9 +66,10 @@ const Coins = () => {
           <HStack spacing={4} p={8} w={"full"} overflowX={"auto"}>
             {pageButtons.map((item, index) => (
               <Button
-                bgColor={"blackAlpha.900"}
+                bgColor={(index+1)===page?"blackAlpha.500":"blackAlpha.900"}
                 color={"white"}
-                onClick={() => changePage(index + 1)}>
+                onClick={() => changePage(index + 1)}
+              >
                 {index + 1}
               </Button>
             ))}
