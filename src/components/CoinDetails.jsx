@@ -1,6 +1,7 @@
 import {
   Badge,
   Box,
+  Button,
   Container,
   HStack,
   Image,
@@ -21,6 +22,7 @@ import { server } from "../index";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ErrorPage from "./ErrorPage";
+import Chart from "./Chart";
 
 const CoinDetails = () => {
   const params = useParams();
@@ -28,13 +30,27 @@ const CoinDetails = () => {
   const [loader, setLoader] = useState(true);
   const [urlError, setUrlError] = useState(false);
   const [currency, setCurrency] = useState("inr");
+  const [days, setDays] = useState("24h");
+  const [chartArray, setChartArray] = useState([]);
   const currencySymbol =
     currency === "inr" ? "₹" : currency === "eur" ? "€" : "$";
+  const swichTimeChart = (selectedDays) => {
+    if (selectedDays === "1y") {
+      setDays("365d");
+    } else {
+      setDays(selectedDays);
+    }
+    setLoader(true);
+  };
+  const chartTime = ["24h", "7d", "14d", "30d", "60d", "200d", "1y", "max"];
   useEffect(() => {
     const fetchCoin = async () => {
       try {
         const { data } = await axios.get(`${server}/coins/${params.id}`);
-        console.log(data);
+        const { data: chartData } = await axios.get(
+          `${server}/coins/${params.id}/market_chart?vs_currency=${currency}&days=${days}`
+        );
+        setChartArray(chartData.prices);
         setCoin(data);
         setLoader(false);
       } catch (error) {
@@ -43,7 +59,7 @@ const CoinDetails = () => {
       }
     };
     fetchCoin();
-  }, [params.id]);
+  }, [params.id, days, currency]);
   if (urlError) return <ErrorPage />;
   return (
     <Container maxW={"container.xl"}>
@@ -51,10 +67,36 @@ const CoinDetails = () => {
         <Loader />
       ) : (
         <>
-          <Box width={"full"} borderWidth={1}>
-            aaa
+          <Box
+            width={"full"}
+            borderWidth={1}
+            sx={{
+              height: "70vh",
+              "@media screen and (max-width: 800px)": {
+                height: "60vh",
+              },
+              "@media screen and (max-width: 600px)": {
+                height: "50vh",
+              },
+              "@media screen and (max-width: 500px)": {
+                height: "40vh",
+              },
+              "@media screen and (max-width: 400px)": {
+                height: "30vh",
+              },
+            }}>
+            <Chart arr={chartArray} currency={currencySymbol} days={days} />
           </Box>
-          {/* Button */}
+          <HStack p={4} overflowX={"auto"}>
+            {chartTime.map((i) => (
+              <Button
+                w={"fit-content"}
+                key={i}
+                onClick={() => swichTimeChart(i)}>
+                {i}
+              </Button>
+            ))}
+          </HStack>
           <RadioGroup value={currency} onChange={setCurrency} p={4}>
             <HStack spacing={4}>
               <Radio value="inr">INR</Radio>
@@ -91,14 +133,29 @@ const CoinDetails = () => {
             <PriceBar
               high={`${currencySymbol}${coin.market_data.high_24h[currency]}`}
               low={`${currencySymbol}${coin.market_data.low_24h[currency]}`}
+            />
+            <Box w={"full"} p={4}>
+              <DetailItem
+                title={"Max Supply"}
+                value={coin.market_data.max_supply}
               />
-              <Box w={"full"} p={4}>
-                <DetailItem title={"Max Supply"} value={coin.market_data.max_supply} />
-                <DetailItem title={"Circulating Supply"} value={coin.market_data.circulating_supply} />
-                <DetailItem title={"Market Capital"} value={`${currencySymbol}${coin.market_data.market_cap[currency]}`} />
-                <DetailItem title={"All Time Low"} value={`${currencySymbol}${coin.market_data.atl[currency]}`} />
-                <DetailItem title={"All Time High"} value={`${currencySymbol}${coin.market_data.ath[currency]}`} />
-              </Box>
+              <DetailItem
+                title={"Circulating Supply"}
+                value={coin.market_data.circulating_supply}
+              />
+              <DetailItem
+                title={"Market Capital"}
+                value={`${currencySymbol}${coin.market_data.market_cap[currency]}`}
+              />
+              <DetailItem
+                title={"All Time Low"}
+                value={`${currencySymbol}${coin.market_data.atl[currency]}`}
+              />
+              <DetailItem
+                title={"All Time High"}
+                value={`${currencySymbol}${coin.market_data.ath[currency]}`}
+              />
+            </Box>
           </VStack>
         </>
       )}
